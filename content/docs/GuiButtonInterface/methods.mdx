@@ -1,0 +1,41 @@
+---
+title: GuiButtonInterface
+description: List of methods and examples
+---
+
+## Methods
+
+```java
+Material getIcon()
+void setIcon(Material icon)
+ItemStack getItem()
+void setItem(ItemStack item)
+GuiButton withListener(Consumer<InventoryClickEvent> listener)
+GuiButton setName(String name)
+GuiButton setLore(List<String> lore)
+GuiButton addItemFlag(ItemFlag flag)
+GuiButton removeItemFlag(ItemFlag flag)
+GuiButton setAmount(int amount)
+GuiButton setDurability(short durability)
+GuiButton addEnchantment(Enchantment enchantment)
+GuiButton addEnchantment(Enchantment enchantment, int level)
+GuiButton removeEnchantment(Enchantment enchantment)
+GuiButton removeAllEnchantments()
+```
+
+## Examples
+
+```java
+GuiButton closeButton = new GuiButton(new ItemStack(Material.BARRIER))
+        .setName("&cClose")
+        .withListener((event) -> {
+            player.closeInventory();
+            return null;
+        });
+
+GuiButton ironSword = new GuiButton(new ItemStack(Material.IRON_SWORD))
+        .setName("&aIron Sword")
+        .addItemFlag(ItemFlag.HIDE_ENCHANTS)
+        .addEnchantment(Enchantment.DAMAGE_ALL, 5)
+        .setDurability((short) 50);
+```

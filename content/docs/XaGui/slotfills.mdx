@@ -1,0 +1,36 @@
+---
+title: Slot filling
+description: Slot filling is just easy way to set multiple slots at once
+---
+
+Slot filling is just easy way to set multiple slots at once
+
+## List of methods:
+
+```java
+void fillSlots(HashSet<Integer> slots)
+void fillSlots(int page, HashSet<Integer> slots)
+void fillSlots(HashSet<Integer> slots, ItemStack item)
+void fillSlots(int page, HashSet<Integer> slots, ItemStack item)
+void fillSlots(int page, HashSet<Integer> slots, GuiButtonInterface button)
+```
+
+## Example:
+
+```java
+GuiMenu gui = xaGui.createMenu("&a&lExample GUI", 3);
+
+gui.fillSlots(new HashSet<>(Arrays.asList(0, 1, 2, 3, 4)));
+
+gui.fillSlots(new HashSet<>(Arrays.asList(12, 13, 14)), new ItemStack(Material.DIRT, 64));
+
+GuiButtonInterface closeButton = new GuiButton(new ItemStack(Material.BARRIER, 1)).setName("&cClose").withListener((event) -> {
+    player.closeInventory();
+    return null;
+}).setLore(Arrays.asList(" ", "&aClick to close Inventory"));
+
+gui.fillSlots(gui.getCurrentPageIndex(), new HashSet<>(Arrays.asList(21, 22, 23)), closeButton);
+```
+
+### Result:
+<img src={"https://xap3y.eu/static/filler.png"} />

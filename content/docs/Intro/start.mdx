@@ -1,0 +1,86 @@
+---
+title: Quick start
+Description: Get started with the Azure SDK for Java
+---
+
+### 1. Create an instance of the XaGUI library in onEnable() method of your plugin
+
+<details>
+<summary>Java code</summary>
+
+    ```java
+    @Override
+    public void onEnable() {
+        XaGUI xaGUI = new XaGUI(this);
+    }
+    ```
+
+</details>
+
+<details>
+    <summary>Kotlin code</summary>
+
+    ```kotlin
+    override fun onEnable() {
+        val xaGUI = XaGUI(this)
+    }
+    ```
+</details>
+
+### 2. Creating a single page GUI with 6 rows
+
+<details>
+    <summary>Java code</summary>
+
+    ```java
+    GuiMenu gui = xaGui.createMenu("&7GUI TITLE", 6);
+
+    try {
+        gui.fillBorder(6);
+    } catch (RowsOutOfBoundException e) {
+        // IGNORE
+    }
+
+    gui.setSlot(49, new GuiButton(new ItemStack(Material.BARRIER)).setName("&a&lClose").withListener((event) -> {
+        player.closeInventory();
+        return null;
+    }));
+
+    gui.setOnOpen((event) -> {
+        player.sendMessage("You opened the GUI!");
+        return null;
+    });
+
+    gui.open(player);
+    ```
+
+</details>
+
+<details>
+    <summary>Kotlin code</summary>
+
+    ```kotlin
+    val gui = xaGui.createMenu("&7GUI TITLE", 6)
+    gui.fillBorder(6)
+
+    gui.setSlot(49, GuiButton(ItemStack(Material.BARRIER)).withListener { event ->
+        event.whoClicked.closeInventory()
+    })
+
+    gui.setOnOpen {
+        it.player.sendMessage("Gui opened")
+    }
+
+    gui.open(player)
+
+    ```
+
+</details>
+
+#### This is the result:
+<img src={"https://xap3y.eu/static/first.png"} />
+
+<br/>
+<br/>
+
+Rest of the documentation will be in Java, hope that you can convert it to Kotlin easily.

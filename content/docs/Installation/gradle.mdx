@@ -1,0 +1,25 @@
+---
+title: Gradle
+description: Gradle
+---
+
+## Gradle installation
+
+
+### First, add JitPack repository to your build file
+
+```groovy
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+```
+
+### Then, add the dependency
+
+| Replace `VERSION` with the version you want to use or with commit hash
+
+```groovy
+dependencies {
+    implementation 'com.github.xap3y:xagui:VERSION'
+}
+```

@@ -1,0 +1,28 @@
+---
+title: Maven
+description: Maven
+---
+
+## Maven installation
+
+
+### First, add JitPack repository to your build file
+
+```xml
+<repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+</repository>
+```
+
+### Then, add the dependency
+
+| Replace `VERSION` with the version you want to use or with commit hash
+
+```xml
+<dependency>
+    <groupId>com.github.xap3y</groupId>
+    <artifactId>xagui</artifactId>
+    <version>VERSION</version>
+</dependency>
+```

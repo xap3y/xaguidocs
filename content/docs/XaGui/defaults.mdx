@@ -1,0 +1,50 @@
+---
+title: Default configuration
+description: simple methods are shown here
+---
+
+## Setting & updating slots
+
+You can set and update slots in the GUI without reopening the GUI
+
+```java
+void setSlot(int slot, GuiButtonInterface button)
+void setSlot(int slot, ItemStack item)
+void setSlot(int slot, Material item)
+void setSlot(int page, int slot, GuiButtonInterface button)
+void setSlot(int page, int slot, ItemStack item)
+void setSlot(int page, int slot, Material item)
+```
+If page is not set, it will use current page opened
+
+### Example of usage
+
+```java
+GuiMenu gui = xaGui.createMenu("Something", 4);
+
+gui.setSlot(0, Material.COAL);
+gui.setSlot(10, new ItemStack(Material.DIRT, 64));
+gui.setSlot(4, new GuiButton(new ItemStack(Material.BARRIER)));
+gui.setSlot(gui.getCurrentPageIndex() + 1, 4, new GuiButton(new ItemStack(Material.BARRIER)));
+```
+
+## Updating slots
+
+Used when you want to modify a slot after a GUI is opened
+
+```java
+void updateSlot(Integer slot, ItemStack item)
+void updateSlot(Integer slot, Material item)
+void updateSlot(Integer page, Integer slot, ItemStack item)
+void updateSlot(Integer page, Integer slot, Material item)
+```
+If you want to update slot with a GuiButton, use .setSlot
+
+### Example of usage
+
+```java
+gui.setSlot(0, new GuiButton(new ItemStack(Material.DIRT)).withListener(event -> {
+    gui.updateSlot(event.getSlot(), new ItemStack(Material.DIAMOND, 64));
+    return null;
+}).setName("&aClick for diamond"));
+```
