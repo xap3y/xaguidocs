@@ -1,0 +1,40 @@
+---
+title: Actions
+description: Actions in XaGUI
+---
+
+```java
+void setOnOpen(Consumer<InventoryOpenEvent> openAction)
+void setOnOpen(GuiOpenInterface openAction)
+
+void setOnClose(Consumer<InventoryCloseEvent> closeAction)
+void setOnClose(GuiCloseInterface closeAction)
+
+void setOnClick(Consumer<InventoryClickEvent> onClick)
+void setOnClick(GuiClickInterface onClick)
+
+void setOnPageSwitch(Consumer<GuiPageSwitchModel> onPageSwitch)
+void setOnPageSwitch(GuiPageSwitchInterface onPageSwitch)
+```
+
+### Example of usage
+
+```java
+GuiMenu gui = xaGui.createMenu("Example GUI", 3);
+
+gui.setOnPageSwitch((data) -> {
+    data.getPlayer().sendMessage("You switched to page " + data.getPage() + " from page " + data.getOldPage());
+});
+
+gui.setOnOpen((event) -> {
+    event.getPlayer().sendMessage("You opened the GUI!");
+});
+
+gui.setOnClose((event) -> {
+    event.getPlayer().sendMessage("You closed the GUI!");
+});
+
+gui.setOnClick((event) -> {
+    event.getWhoClicked().sendMessage("You clicked on slot " + event.getSlot());
+});
+```

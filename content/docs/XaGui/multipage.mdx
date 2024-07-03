@@ -7,7 +7,7 @@ This example will create a GUI with 2 pages, both having 3 rows \
 Pages are counted from 1 in constructor and from 0 in methods
 
 ```java
-GuiMenu gui = instance.createMenu("&a&lExample", 3, 2);
+GuiMenu gui = xaGui.createMenu("&a&lExample", 3, 2);
 
 gui.getCurrentPage();      // 1      (first page)
 gui.getCurrentPageIndex(); // 0      (first page but indexed from 0)
@@ -20,18 +20,23 @@ gui.setSlot(1, 1, Material.CHARCOAL); // Now we set COAL to slot 0 on page 2 (1 
 
 // Pages are indexed from 0 in all methods, such as .setSlot, .switchPage, etc.
 gui.setSlot(0, 26, new GuiButton(new ItemStack(Material.ARROW)).setName("&aNext page").withListener((event) -> {
-    gui.switchPage(gui.getCurrentPageIndex() + 1, (Player) event.getWhoClicked());
-    return null;
+    try {
+        gui.switchPage(gui.getCurrentPageIndex() + 1, (Player) event.getWhoClicked());
+    } catch (PageOutOfBoundException e) {
+        // IGNORE
+    }
 }));
 
 gui.setSlot(1, 18, new GuiButton(new ItemStack(Material.ARROW)).setName("&cGo back").withListener((event) -> {
-    gui.switchPage(gui.getCurrentPageIndex() - 1, (Player) event.getWhoClicked());
-    return null;
+    try {
+        gui.switchPage(gui.getCurrentPageIndex() - 1, (Player) event.getWhoClicked());
+    } catch (PageOutOfBoundException e) {
+        // IGNORE
+    }
 }));
 
 gui.setOnPageSwitch((data) -> {
-    player.sendMessage("You switched to page " + data.getPage() + " from page " + data.getOldPage());
-    return null;
+    data.getPlayer().sendMessage("You switched to page " + data.getPage() + " from page " + data.getOldPage());
 });
 
 gui.open(player);

@@ -1,5 +1,5 @@
 ---
-title: Default configuration
+title: Setting & updating slots
 description: simple methods are shown here
 ---
 
@@ -45,6 +45,5 @@ If you want to update slot with a GuiButton, use .setSlot
 ```java
 gui.setSlot(0, new GuiButton(new ItemStack(Material.DIRT)).withListener(event -> {
     gui.updateSlot(event.getSlot(), new ItemStack(Material.DIAMOND, 64));
-    return null;
 }).setName("&aClick for diamond"));
 ```

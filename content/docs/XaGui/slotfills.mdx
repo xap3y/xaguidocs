@@ -26,7 +26,6 @@ gui.fillSlots(new HashSet<>(Arrays.asList(12, 13, 14)), new ItemStack(Material.D
 
 GuiButtonInterface closeButton = new GuiButton(new ItemStack(Material.BARRIER, 1)).setName("&cClose").withListener((event) -> {
     player.closeInventory();
-    return null;
 }).setLore(Arrays.asList(" ", "&aClick to close Inventory"));
 
 gui.fillSlots(gui.getCurrentPageIndex(), new HashSet<>(Arrays.asList(21, 22, 23)), closeButton);
