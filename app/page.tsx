@@ -21,7 +21,7 @@ export default function HomePage() {
         XaGUI Documentation
       </h1>
       <p>
-        You can open{' '}
+        Please visit{' '}
         <Link
           href="/docs"
           style={{

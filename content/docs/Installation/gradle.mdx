@@ -23,3 +23,20 @@ dependencies {
     implementation 'com.github.xap3y:xagui:VERSION'
 }
 ```
+
+### Shading
+
+Replace `your.plugin.utils` with your package name
+
+```groovy
+plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'java'
+}
+
+tasks {
+    shadowJar {
+        relocate 'eu.xap3y.xagui', 'your.plugin.utils'
+    }
+}
+```
