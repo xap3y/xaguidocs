@@ -10,9 +10,12 @@ const inter = Inter({
 export default function Layout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={inter.className} suppressHydrationWarning>
-      <body>
-        <RootProvider>{children}</RootProvider>
-      </body>
+    <head>
+        <meta httpEquiv="refresh" content="0; URL=https://xagui.xap3y.eu/docs"/>
+    </head>
+    <body>
+    <RootProvider>{children}</RootProvider>
+    </body>
     </html>
   );
 }
