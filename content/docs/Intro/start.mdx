@@ -35,16 +35,9 @@ Description: Get started with the Azure SDK for Java
     ```java
     GuiMenu gui = xaGui.createMenu("&7GUI TITLE", 6);
 
-    try {
-        gui.fillBorder(6);
-    } catch (RowsOutOfBoundException e) {
-        // IGNORE
-    }
+    gui.fillBorder();
 
-    gui.setSlot(49, new GuiButton(new ItemStack(Material.BARRIER)).setName("&a&lClose").withListener((event) -> {
-        player.closeInventory();
-        return null;
-    }));
+    gui.addCloseButton();
 
     gui.setOnOpen((event) -> {
         player.sendMessage("You opened the GUI!");
@@ -61,11 +54,9 @@ Description: Get started with the Azure SDK for Java
 
     ```kotlin
     val gui = xaGui.createMenu("&7GUI TITLE", 6)
-    gui.fillBorder(6)
+    gui.fillBorder()
 
-    gui.setSlot(49, GuiButton(ItemStack(Material.BARRIER)).withListener { event ->
-        event.whoClicked.closeInventory()
-    })
+    gui.addCloseButton();
 
     gui.setOnOpen {
         it.player.sendMessage("Gui opened")

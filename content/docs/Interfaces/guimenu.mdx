@@ -1,0 +1,136 @@
+---
+title: GuiInterface
+description: List of all methods
+---
+
+## Methods
+
+| Method | Returns |
+| --- | --- |
+| setOnOpen(Consumer\<InventoryOpenEvent\> listener) |  |
+| setOnClose(Consumer\<InventoryCloseEvent\> listener) |  |
+| setOnClose(Consumer\<InventoryClickEvent\> listener) |  |
+| setOnPageSwitch(Consumer\<GuiPageSwitchModel\> data) |  |
+| setName(String name) |  |
+| getName() | String |
+| getRawName() | String |
+| getSize() | Int |
+| getPages() | Int |
+| getCurrentPageIndex() | Int |
+| getCurrentPage() | Int |
+| setSlot(Int slot, GuiButtonInterface button) |  |
+| setSlot(Int slot, ItemStack item) |  |
+| setSlot(Int slot, Material item) |  |
+| setSlot(Int page, Int slot, GuiButtonInterface button) |  |
+| setSlot(Int page, Int slot, ItemStack item) |  |
+| setSlot(Int page, Int slot, Material item) |  |
+| updateSlot(Int slot, ItemStack item) |  |
+| updateSlot(Int slot, Material item) |  |
+| updateSlot(Int page, Int slot, ItemStack item) |  |
+| updateSlot(Int page, Int slot, Material item) |  |
+| getSlot(Int slot) | GuiButtonInterface |
+| getSlot(Int page, Int slot) | GuiButtonInterface |
+| clearSlot(Int slot) |  |
+| clearSlot(Int page, Int slot) |  |
+| clearAllSlots() |  |
+| clearAllSlots(Int page) |  |
+| getOwner() | JavaPlugin |
+| unlockButton(Int slot) |  |
+| unlockButton(Int page, Int slot) |  |
+| lockButton(Int slot) |  |
+| lockButton(Int page, Int slot) |  |
+| open(Player player) |  |
+| open(Int page, Player player) |  |
+| switchPage(Int pageIndex, Player player) |  |
+| getMaxPages() | Int |
+| stickSlot(Int slot) |  |
+| unStickSlot(Int slot) |  |
+| close(Player player) |  |
+| fillSlots(Set\<Int\> slots) |  |
+| fillSlots(Set\<Int\> slots, ItemStack item) |  |
+| fillSlots(Int page, Set\<Int\> slots) |  |
+| fillSlots(Int page, Set\<Int\> slots, ItemStack item) |  |
+| fillSlots(Int page, Set\<Int\> slots, GuiButtonInterface button) |  |
+| addCloseButton() |  |
+| addCloseButtonAllPages() |  |
+| addCloseButton(Int page, ItemStack button) |  |
+| fillBorder() |  |
+| fillBorder(Int page, ItemStack item) |  |
+| fillBorder(ItemStack item) |  |
+| fillBorder(Material item) |  |
+| setSelfInventoryAccess(Boolean value) |  |
+| getSelfInventoryAccess() | Boolean |
+| allowClickTypes(ClickType... types) |  |
+| blacklistClickTypes(ClickType... types) |  |
+| getAllowedClickTypes() | HashSet\<ClickType\> |
+| getBlacklistedClickTypes() | HashSet\<ClickType\> |
+
+## Examples
+
+### Setting & updating slots
+```java
+gui.setSlot(4, new GuiButton(Material.DIRT));
+
+gui.setSlot(5, new ItemStack(Material.DIRT, 64));
+
+gui.setSlot(6, new GuiButton(Material.DIRT).setName("&bDirt"));
+
+gui.setSlot(7, new GuiButton(new ItemStack(Material.DIRT)).setName("&bDirt").setLore("", "&fIm dirt"));
+```
+
+### Creating listeners
+```java
+gui.setOnClick((event) -> {
+    event.getWhoClicked().sendMessage("You clicked slot " + event.getSlot());
+});
+
+gui.setOnOpen((event) -> {
+    event.getPlayer().sendMessage("You opened the menu!");
+});
+
+gui.setOnClose((event) -> {
+    event.getPlayer().sendMessage("You closed the menu!");
+});
+
+gui.setOnPageSwitch((event) -> {
+    event.getPlayer().sendMessage("Switched page: " + (event.getOldPage()) + " -> " + event.getPage());
+});
+```
+
+### Other methods
+```java
+gui.fillBorder();
+
+gui.addCloseButton();
+
+// First page, close button is now redstone torch
+gui.addCloseButton(0, new ItemStack(Material.REDSTONE_TORCH));
+
+// Gui Button that will open us another GUI
+// But replace the ExamplePages::createGui with your own method
+gui.setSlot(13, new GuiButton(Material.CHEST).setName("&9Open").setLore("", "&eClick to open another GUI").withRedirect(ExamplePages::createGui));
+
+// This will allow player to access his inventory
+gui.setSelfInventoryAccess(true);
+
+// Allow only left click
+gui.allowClickTypes(ClickType.LEFT);
+
+// Blacklist right click, any other type of click is allowed
+gui.blacklistClickTypes(ClickType.RIGHT);
+
+gui.open(player);
+
+gui.close(player);
+
+gui.switchPage(1, player);
+
+// Fill those slots with the default item which is GRAY_STAINED_GLASS_PANE
+gui.fillSlots(new HashSet<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53));
+
+// This slot will be locked displayed on all pages
+gui.stickSlot(0);
+
+// This slot will be unlocked and players can take items from it
+gui.unlockButton(0);
+```

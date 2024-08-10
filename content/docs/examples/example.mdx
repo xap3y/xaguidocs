@@ -1,0 +1,180 @@
+---
+title: Gui Example
+description: Creation of GUI and multi page GUI
+---
+
+# Creating single page GUI with item inside that will redirect to another multi-page GUI
+
+
+### 1. Creating a single page GUI with 6 rows
+```java
+public class ExampleGui {
+
+    public static void open(Player p) {
+        createGui().open(p);
+    }
+
+    private static GuiMenu createGui() {
+
+        GuiMenu gui = Seasons.xagui.createMenu("&bExample", 6);
+
+        // Fill border with GRAY_STAINED_GLASS_PANE by default
+        gui.fillBorder();
+
+        // Or you can fill border with specified Material or ItemStack:
+        // gui.fillBorder(Material.DIRT);
+
+        // Creating our fist GUI Button:
+        // You can neither use Material or ItemStack
+        GuiButton button1 = new GuiButton(Material.DIAMOND);
+
+        // And if you are using XaGUI version pre-v0.4 or lower, you can only use ItemStack
+        //GuiButton button1 = new GuiButton(new ItemStack(Material.DIAMOND));
+
+
+        // Now we can set slot 4 to our created button above, rename it and set its amount to 64
+        gui.setSlot(4, button1.setName("&b&lDiamond").setAmount(64));
+
+        // And add an automatically generated close button (barrier)
+        gui.addCloseButton();
+
+        // Or you can add a custom close button:
+        // gui.addCloseButton(new ItemStack(Material.REDSTONE_TORCH));
+
+        // Now we are going to create a button in slot 22 that will give us 1x EMERALD after clicking on it
+
+        GuiButton emeraldButton = new GuiButton(Material.EMERALD).setName("&a&lEmerald").withListener((event) -> {
+            Player player = (Player) event.getWhoClicked();
+            player.getInventory().addItem(new ItemStack(Material.EMERALD));
+        });
+        gui.setSlot(22, emeraldButton);
+
+        // Let's modify allowed click types, so only left click will be allowed nothing else
+        // Whitelist has higher priority than Blacklist
+        // gui.allowClickTypes(ClickType.LEFT);
+
+        // Or you can blacklist some click types, so everything is allowed except the ones you specify
+        // gui.blacklistClickTypes(ClickType.RIGHT, ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT);
+
+
+        // You can also create click listener for the whole menu
+        // If you click a button with listener it will be called after this global one
+        gui.setOnClick((event) -> {
+            event.getWhoClicked().sendMessage("You clicked slot " + event.getSlot());
+        });
+
+        // Or create onOpen or onClose listeners
+        gui.setOnOpen((event) -> {
+            event.getPlayer().sendMessage("You opened the menu!");
+        });
+
+        gui.setOnClose((event) -> {
+            event.getPlayer().sendMessage("You closed the menu!");
+        });
+
+        // We can also unlock slot, so players can take items from it
+        // To lock it again use .lockButton(slot)
+        gui.setSlot(23, Material.GRASS_BLOCK);
+        try {
+            gui.unlockButton(23);
+            /*
+                The item can be only taken by shift left click
+                 It is because XaGUI is automatically blocking click action on AdjacentSlots (player's inventory)
+                 So solution would be .setSelfInventoryAccess(true) to allow player click on his inventory
+                 But be careful, because player can shift click any item from his inventory to the menu
+             */
+            //gui.setSelfInventoryAccess(true);
+        } catch (SlotOutOfBoundException e) {
+            // IGNORE
+        }
+
+        // Now we will create a button that will change its icon from book to bookshelf after clicking on it, and keep the listener
+        GuiButton changingButton = new GuiButton(new ItemStack(Material.BOOK)).setName("&a&lClick me!").withListener((event) -> {
+            gui.updateSlot(event.getSlot(), Material.BOOKSHELF);
+
+            // If you want to drop the listener, use .setSlot() instead of .updateSlot()
+            //gui.setSlot(event.getSlot(), Material.BOOKSHELF);
+        });
+
+        gui.setSlot(24, changingButton);
+
+        gui.setSlot(13, new GuiButton(new ItemStack(Material.CHEST)).setName("&9Multi page GUI").setLore("", "&eClick to open multi page GUI").withRedirect(ExamplePages::createGui));
+
+        return gui;
+    }
+}
+```
+
+### 2. Creating a multi-page GUI with 6 rows and 2 pages
+```java
+public class ExamplePages {
+
+    public static GuiMenu createGui() {
+
+        // We will create gui with 2 pages, all pages will have same amount of rows
+        GuiMenu gui = Seasons.xagui.createMenu("&bExample", 3, 2);
+
+        // This will fill border for all pages by default
+        gui.fillBorder();
+        // But you can also fill border for specific page, but you need to add second parameter which is ItemStack
+        //gui.fillBorder(1, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
+
+        // We can add close buttons to all pages
+        gui.addCloseButtonAllPages();
+
+        // Now we can set paper in slot 4 of first page
+        gui.setSlot(0, 4, new GuiButton(Material.PAPER).setName("&b&lPage: 1"));
+
+        // Now we can set oak sign in slot 4 of second page
+        gui.setSlot(1, 4, new GuiButton(Material.OAK_SIGN).setName("&6&lPage: 2"));
+
+        // Setting the next and previous page buttons
+        gui.setSlot(0, 26, new GuiButton(Material.ARROW).setName("&fNext page").withListener((event) -> {
+            try {
+                gui.switchPage(gui.getCurrentPageIndex()+1, (Player) event.getWhoClicked());
+            } catch (PageOutOfBoundException e) {
+                throw new RuntimeException(e);
+            }
+        }));
+
+        gui.setSlot(1, 18, new GuiButton(Material.ARROW).setName("&fPrevious page").withListener((event) -> {
+            try {
+                gui.switchPage(gui.getCurrentPageIndex()-1, (Player) event.getWhoClicked());
+            } catch (PageOutOfBoundException e) {
+                throw new RuntimeException(e);
+            }
+        }));
+
+        // Now we will set some items on the first page
+        gui.setSlot(0, 10, Material.DIAMOND_SWORD);
+        gui.setSlot(0, 11, Material.DIAMOND_PICKAXE);
+        gui.setSlot(0, 12, Material.DIAMOND_AXE);
+        gui.setSlot(0, 13, Material.DIAMOND_SHOVEL);
+
+        // And some items on the second page
+        gui.setSlot(1, 10, Material.DIAMOND_HELMET);
+        gui.setSlot(1, 11, Material.DIAMOND_CHESTPLATE);
+        gui.setSlot(1, 12, Material.DIAMOND_LEGGINGS);
+        gui.setSlot(1, 13, Material.DIAMOND_BOOTS);
+
+        // We can also set a listener for page switch
+        gui.setOnPageSwitch((event) -> {
+            event.getPlayer().sendMessage("Switched page: " + (event.getOldPage()) + " -> " + event.getPage());
+        });
+
+        return gui;
+    }
+}
+```
+
+### 3. Opening a single page GUI
+```java
+ExampleGui.open(player);
+```
+
+## This is the result afterwards:
+
+<video width="1000" height="240" controls preload="none">
+    <source src="https://static.xap3y.space/xagui/showcaseXaGUI3-2024-08-10_14.27.20.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+</video>

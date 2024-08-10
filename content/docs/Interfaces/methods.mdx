@@ -12,6 +12,8 @@ description: List of methods and examples
 | setItem(ItemStack item) |  |
 | withListener(Consumer\<InventoryClickEvent\> listener) | GuiButton |
 | withListener(ButtonListener listener) | GuiButton |
+| withRedirect(() -\> GuiMenu) | GuiButton |
+| callRedirect(Player p) | |
 | nullable getClickListener() | ButtonListener |
 | getIcon() | Material |
 | setIcon(Material icon) | GuiButton |
@@ -32,6 +34,7 @@ description: List of methods and examples
 | addLoreList(ArrayList\<String\> list) | GuiButton |
 | addLoreArray(String[] lore) | GuiButton |
 | clearLore() |  |
+| clone() | GuiButton |
 
 ## Examples
 
