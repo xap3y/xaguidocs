@@ -5,24 +5,48 @@ description: Maven
 
 ## Maven installation
 
+<a href={"https://central.sonatype.com/artifact/eu.xap3y/xagui"}>
+    <img alt="Maven Central Version" src="https://img.shields.io/maven-central/v/eu.xap3y/xagui" />
+</a>
 
-### First, add JitPack repository to your build file
 
-```xml
-<repository>
-    <id>jitpack.io</id>
-    <url>https://jitpack.io</url>
-</repository>
-```
-
-### Then, add the dependency
-
-| Replace `VERSION` with the version you want to use or with commit hash
+### Add the dependency
 
 ```xml
 <dependency>
-    <groupId>com.github.xap3y</groupId>
+    <groupId>eu.xap3y</groupId>
     <artifactId>xagui</artifactId>
-    <version>VERSION</version>
+    <version>1.1</version>
 </dependency>
+```
+
+### Shading
+
+Replace `your.plugin.utils` with your package name
+
+```xml
+<plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.6.0</version>
+        <configuration>
+            <relocations>
+                <relocation>
+                    <pattern>eu.xap3y.xagui</pattern>
+                    <!-- Replace your.plugin.utils with your real package -->
+                    <shadedPattern>your.plugin.utils</shadedPattern>
+                </relocation>
+            </relocations>
+        </configuration>
+        <executions>
+            <execution>
+                <phase>package</phase>
+                <goals>
+                    <goal>shade</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+</plugins>
 ```

@@ -5,22 +5,21 @@ description: Gradle
 
 ## Gradle installation
 
-
-### First, add JitPack repository to your build file
+<a href={"https://central.sonatype.com/artifact/eu.xap3y/xagui"}>
+    <img alt="Maven Central Version" src="https://img.shields.io/maven-central/v/eu.xap3y/xagui" />
+</a>
 
 ```groovy
 repositories {
-    maven { url 'https://jitpack.io' }
+    mavenCentral()
 }
 ```
 
-### Then, add the dependency
-
-| Replace `VERSION` with the version you want to use or with commit hash
+### Add the dependency
 
 ```groovy
 dependencies {
-    implementation 'com.github.xap3y:xagui:0.5'
+    implementation 'eu.xap3y:xagui:1.1'
 }
 ```
 
