@@ -11,7 +11,7 @@ Description: Get started with the Azure SDK for Java
     ```java
     @Override
     public void onEnable() {
-        XaGUI xaGUI = new XaGUI(this);
+        XaGui xaGui = new XaGui(this);
     }
     ```
 
@@ -22,7 +22,7 @@ Description: Get started with the Azure SDK for Java
 
     ```kotlin
     override fun onEnable() {
-        val xaGUI = XaGUI(this)
+        val xaGui = XaGui(this)
     }
     ```
 </details>
@@ -40,8 +40,7 @@ Description: Get started with the Azure SDK for Java
     gui.addCloseButton();
 
     gui.setOnOpen((event) -> {
-        player.sendMessage("You opened the GUI!");
-        return null;
+        event.getPlayer().sendMessage("You opened the GUI!");
     });
 
     gui.open(player);
