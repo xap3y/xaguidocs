@@ -1,111 +1,49 @@
 ---
-title: Single Page GUI Example
-description: Creation of GUI
+title: Complete single-page menu
+description: A copyable command menu with buttons, a border, and lifecycle events.
 ---
 
-# Creating single page GUI with item inside that will redirect to another multi-page GUI
+This class builds a fresh menu for each opening, which is a safe default when content may differ between players.
 
-
-### Creating a single page GUI with 6 rows
 ```java
-public class ExampleGui {
+import eu.xap3y.xagui.GuiMenu;
+import eu.xap3y.xagui.XaGui;
+import eu.xap3y.xagui.models.GuiButton;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
-    public static void open(Player p) {
-        createGui().open(p);
+public final class RewardsMenu {
+    private final XaGui xaGui;
+
+    public RewardsMenu(XaGui xaGui) {
+        this.xaGui = xaGui;
     }
 
-    private static GuiMenu createGui() {
+    public void open(Player player) {
+        GuiMenu menu = xaGui.createMenu("&8Rewards", 3);
 
-        GuiMenu gui = Seasons.xagui.createMenu("&bExample", 6);
+        menu.fillBorder(Material.GRAY_STAINED_GLASS_PANE);
+        menu.addCloseButton();
+        menu.setOpenSound(Sound.BLOCK_CHEST_OPEN, 0.7f);
 
-        // Fill border with GRAY_STAINED_GLASS_PANE by default
-        gui.fillBorder();
+        GuiButton reward = new GuiButton(Material.DIAMOND)
+                .setName("&bDaily reward")
+                .setLore("", "&7Click to claim", "&eOne diamond")
+                .withListener(event -> {
+                    Player clicker = event.getPlayer();
+                    clicker.getInventory().addItem(new ItemStack(Material.DIAMOND));
+                    clicker.sendMessage("§aReward claimed!");
+                    clicker.closeInventory();
+                });
 
-        // Or you can fill border with specified Material or ItemStack:
-        // gui.fillBorder(Material.DIRT);
-
-        // Creating our fist GUI Button:
-        // You can neither use Material or ItemStack
-        GuiButton button1 = new GuiButton(Material.DIAMOND);
-
-        // And if you are using XaGUI version pre-v0.4 or lower, you can only use ItemStack
-        //GuiButton button1 = new GuiButton(new ItemStack(Material.DIAMOND));
-
-
-        // Now we can set slot 4 to our created button above, rename it and set its amount to 64
-        gui.setSlot(4, button1.setName("&b&lDiamond").setAmount(64));
-
-        // And add an automatically generated close button (barrier)
-        gui.addCloseButton();
-
-        // Or you can add a custom close button:
-        // gui.addCloseButton(new ItemStack(Material.REDSTONE_TORCH));
-
-        // Now we are going to create a button in slot 22 that will give us 1x EMERALD after clicking on it
-
-        GuiButton emeraldButton = new GuiButton(Material.EMERALD).setName("&a&lEmerald").withListener((event) -> {
-            Player player = (Player) event.getWhoClicked();
-            player.getInventory().addItem(new ItemStack(Material.EMERALD));
-        });
-        gui.setSlot(22, emeraldButton);
-
-        // Let's modify allowed click types, so only left click will be allowed nothing else
-        // Whitelist has higher priority than Blacklist
-        // gui.allowClickTypes(ClickType.LEFT);
-
-        // Or you can blacklist some click types, so everything is allowed except the ones you specify
-        // gui.blacklistClickTypes(ClickType.RIGHT, ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT);
-
-
-        // You can also create click listener for the whole menu
-        // If you click a button with listener it will be called after this global one
-        gui.setOnClick((event) -> {
-            event.getWhoClicked().sendMessage("You clicked slot " + event.getSlot());
-        });
-
-        // Or create onOpen or onClose listeners
-        gui.setOnOpen((event) -> {
-            event.getPlayer().sendMessage("You opened the menu!");
-        });
-
-        gui.setOnClose((event) -> {
-            event.getPlayer().sendMessage("You closed the menu!");
-        });
-
-        // We can also unlock slot, so players can take items from it
-        // To lock it again use .lockButton(slot)
-        gui.setSlot(23, Material.GRASS_BLOCK);
-        try {
-            gui.unlockButton(23);
-            /*
-                The item can be only taken by shift left click
-                 It is because XaGUI is automatically blocking click action on AdjacentSlots (player's inventory)
-                 So solution would be .setSelfInventoryAccess(true) to allow player click on his inventory
-                 But be careful, because player can shift click any item from his inventory to the menu
-             */
-            //gui.setSelfInventoryAccess(true);
-        } catch (SlotOutOfBoundException e) {
-            // IGNORE
-        }
-
-        // Now we will create a button that will change its icon from book to bookshelf after clicking on it, and keep the listener
-        GuiButton changingButton = new GuiButton(new ItemStack(Material.BOOK)).setName("&a&lClick me!").withListener((event) -> {
-            gui.updateSlot(event.getSlot(), Material.BOOKSHELF);
-
-            // If you want to drop the listener, use .setSlot() instead of .updateSlot()
-            //gui.setSlot(event.getSlot(), Material.BOOKSHELF);
-        });
-
-        gui.setSlot(24, changingButton);
-
-        gui.setSlot(13, new GuiButton(new ItemStack(Material.CHEST)).setName("&9Multi page GUI").setLore("", "&eClick to open multi page GUI").withRedirect(ExamplePages::createGui));
-
-        return gui;
+        menu.setSlot(13, reward);
+        menu.setOnClose(event ->
+                event.getPlayer().sendMessage("§7Rewards menu closed."));
+        menu.open(player);
     }
 }
 ```
 
-### Opening a single page GUI
-```java
-ExampleGui.open(player);
-```
+Create `RewardsMenu` once and call `open(player)` from your command executor or event listener.

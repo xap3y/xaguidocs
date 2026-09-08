@@ -1,53 +1,44 @@
 ---
-title: GuiButtonInterface
-description: List of methods and examples
+title: GuiButton API
+description: GuiButton and GuiButtonInterface methods in XaGUI 1.6.1.
 ---
 
-## Methods
+```java
+GuiButton simple = new GuiButton(Material.DIAMOND);
+GuiButton existing = new GuiButton(itemStack);
+```
 
-| Method | Returns |
+Styling and behavior methods return the same `GuiButton` for chaining unless noted.
+
+| Method | Purpose |
 | --- | --- |
-| getIcon() | Material    |
-| setIcon(Material icon)  |  |
-| setItem(ItemStack item) |  |
-| withListener(Consumer\<InventoryClickEvent\> listener) | GuiButton |
-| withListener(ButtonListener listener) | GuiButton |
-| withRedirect(() -\> GuiMenu) | GuiButton |
-| callRedirect(Player p) | |
-| nullable getClickListener() | ButtonListener |
-| getIcon() | Material |
-| setIcon(Material icon) | GuiButton |
-| setItem(ItemStack item) | GuiButton |
-| setName(string name) | GuiButton |
-| addItemFlag(ItemFlag flag) | GuiButton |
-| removeItemFlag(ItemFlag flag) | GuiButton |
-| setAmount(int amount) | GuiButton |
-| setDurability(short durability) | GuiButton |
-| addEnchantment(Enchantment enchantment) | GuiButton |
-| addEnchantment(Enchantment enchantment, int level) | GuiButton |
-| removeEnchantment(Enchantment enchantment) | GuiButton |
-| removeAllEnchantments() | GuiButton |
-| setLore(String... lore) | GuiButton |
-| setLoreList(ArrayList\<String\> list) | GuiButton |
-| setLoreArray(String[] lore) | GuiButton |
-| addLore(String... lore) | GuiButton |
-| addLoreList(ArrayList\<String\> list) | GuiButton |
-| addLoreArray(String[] lore) | GuiButton |
-| clearLore() |  |
-| clone() | GuiButton |
+| `setName(String)` | Set display name with `&` color codes. |
+| `setLore(String...)` / `setLoreList(List<String>)` | Replace lore. |
+| `addLoreLine(String)` / `addLore(String...)` / `addLoreList(List<String>)` | Append lore. |
+| `clearLore()` | Remove lore. |
+| `setAmount(int)` | Set stack size. |
+| `addItemFlag(...)` / `removeItemFlag(...)` | Change item flags. |
+| `addEnchantment(Enchantment[, int])` | Add an unsafe enchantment. |
+| `removeEnchantment(...)` / `removeAllEnchantments()` | Remove enchantments. |
+| `setDurability(short)` | Set legacy durability. |
+| `withListener(GuiClickInterface)` | Handle button clicks. |
+| `withRedirect(Supplier<GuiMenuInterface>)` | Open another menu after the handler. |
+| `withClickSound(Sound, float)` | Set this button's sound. |
+| `clone()` | Clone its item and copy behavior references. |
 
-## Examples
+Accessors include `getIcon()`, `getItem()`, `getClickListener()`, `getClickSound()`, and `getClickSoundVolume()`. `setItem(ItemStack)` replaces the item and returns `void`; `callRedirect(Player)` manually invokes a configured redirect.
 
 ```java
-GuiButton closeButton = new GuiButton(new ItemStack(Material.BARRIER))
-        .setName("&cClose")
-        .withListener((event) -> {
-            player.closeInventory();
-        }).setLore(" ", "&eClick to close");
-
-GuiButton ironSword = new GuiButton(new ItemStack(Material.IRON_SWORD))
-        .setName("&aIron Sword")
+GuiButton sword = new GuiButton(Material.IRON_SWORD)
+        .setName("&aStarter sword")
+        .setLore("&7Sharp and shiny", "", "&eClick to claim")
         .addItemFlag(ItemFlag.HIDE_ENCHANTS)
-        .addEnchantment(Enchantment.DAMAGE_ALL, 5)
-        .setDurability((short) 50);
+        .addEnchantment(Enchantment.SHARPNESS, 1)
+        .withClickSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.7f)
+        .withListener(event -> {
+            event.getPlayer().getInventory().addItem(new ItemStack(Material.IRON_SWORD));
+            event.getPlayer().closeInventory();
+        });
 ```
+
+When reusing a template button, call `clone()` before changing its listener or metadata.

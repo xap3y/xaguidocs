@@ -1,46 +1,59 @@
 ---
-title: Multiple pages
-description: This is a multiple pages example
+title: Pages and pagination
+description: Create, resize, navigate, and decorate multi-page menus.
 ---
 
-This example will create a GUI with 2 pages, both having 3 rows \
-Pages are counted from 1 in constructor and from 0 in methods
-
 ```java
-GuiMenu gui = xaGui.createMenu("&a&lExample", 3, 2);
-
-gui.getCurrentPage();      // 1      (first page)
-gui.getCurrentPageIndex(); // 0      (first page but indexed from 0)
-
-gui.setSlot(1, Material.COAL); // The page here is not set, so it will be set to the current page which is 1 (0 indexed)
-gui.setSlot(0, 2, Material.COAL); // Same as above, but slot 2 instead of 1
-
-gui.setSlot(1, 0, Material.COAL); // Now we set COAL to slot 0 on page 2 (1 indexed)
-gui.setSlot(1, 1, Material.CHARCOAL); // Now we set COAL to slot 0 on page 2 (1 indexed)
-
-// Pages are indexed from 0 in all methods, such as .setSlot, .switchPage, etc.
-gui.setSlot(0, 26, new GuiButton(new ItemStack(Material.ARROW)).setName("&aNext page").withListener((event) -> {
-    try {
-        gui.switchPage(gui.getCurrentPageIndex() + 1, (Player) event.getWhoClicked());
-    } catch (PageOutOfBoundException e) {
-        // IGNORE
-    }
-}));
-
-gui.setSlot(1, 18, new GuiButton(new ItemStack(Material.ARROW)).setName("&cGo back").withListener((event) -> {
-    try {
-        gui.switchPage(gui.getCurrentPageIndex() - 1, (Player) event.getWhoClicked());
-    } catch (PageOutOfBoundException e) {
-        // IGNORE
-    }
-}));
-
-gui.setOnPageSwitch((data) -> {
-    data.getPlayer().sendMessage("You switched to page " + data.getPage() + " from page " + data.getOldPage());
-});
-
-gui.open(player);
+GuiMenu menu = xaGui.createMenu("&8Catalog", 6, 3);
 ```
 
-### This is the result:
-<img src={"https://static.xap3y.eu/xagui/showcaseXaGUI3-2024-08-10_14.27.20.gif"} />
+Pages use zero-based indexes in every method. Valid indexes above are `0`, `1`, and `2`.
+
+```java
+menu.setSlot(0, 10, Material.DIAMOND);
+menu.setSlot(1, 10, Material.EMERALD);
+menu.setSlot(2, 10, Material.GOLD_INGOT);
+
+menu.getCurrentPageIndex(); // zero-based
+menu.getCurrentPage();      // one-based display number
+menu.getMaxPages();         // allocated count
+```
+
+## Automatic paginator
+
+```java
+menu.fillBorder();
+menu.addCloseButtonAllPages();
+menu.addPaginator();
+menu.setPageSwitchSound(Sound.ITEM_BOOK_PAGE_TURN);
+menu.open(player);
+```
+
+Previous and next controls appear in the bottom row at columns 4 and 6 (zero-based offsets `3` and `5`). The close button uses the center column.
+
+## Shared controls
+
+```java
+GuiButton back = new GuiButton(Material.OAK_DOOR)
+        .setName("&eBack")
+        .withListener(event -> openMainMenu(event.getPlayer()));
+
+menu.setAllPageSlot(45, back);
+```
+
+Or put a button on page `0` and make its slot sticky; it is copied when another page opens:
+
+```java
+menu.setSlot(0, 45, back);
+menu.stickSlot(45);
+```
+
+## Dynamic page counts
+
+```java
+int itemsPerPage = 28;
+int pages = Math.max(1, (int) Math.ceil(entries.size() / (double) itemsPerPage));
+menu.setTotalPages(pages);
+```
+
+Call `setTotalPages` before borders, all-page controls, and data slots. `switchPage(index, player)` throws `PageOutOfBoundException` for an invalid index; the automatic paginator only creates valid navigation buttons.

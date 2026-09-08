@@ -1,41 +1,41 @@
 ---
 title: Gradle
-description: Gradle
+description: Add XaGUI 1.6.1 to a Gradle plugin project.
 ---
 
-## Gradle installation
-
-<a href={"https://central.sonatype.com/artifact/eu.xap3y/xagui"}>
-    <img alt="Maven Central Version" src="https://img.shields.io/maven-central/v/eu.xap3y/xagui" />
-</a>
+XaGUI 1.6.1 is available from Maven Central.
 
 ```groovy
 repositories {
     mavenCentral()
 }
-```
 
-### Add the dependency
-
-```groovy
 dependencies {
-    implementation 'eu.xap3y:xagui:1.3.2'
+    implementation 'eu.xap3y:xagui:1.6.1'
 }
 ```
 
-### Shading
-
-Replace `your.plugin.utils` with your package name
+XaGUI is a library, so it normally needs to be included in your plugin JAR:
 
 ```groovy
 plugins {
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'java'
+    id 'com.gradleup.shadow' version '8.3.6'
 }
 
-tasks {
-    shadowJar {
-        relocate 'eu.xap3y.xagui', 'your.plugin.utils'
-    }
+tasks.named('shadowJar') {
+    relocate 'eu.xap3y.xagui', 'com.example.myplugin.libs.xagui'
+}
+
+tasks.named('build') {
+    dependsOn tasks.named('shadowJar')
 }
 ```
+
+Replace `com.example.myplugin` with your own package. Relocation avoids conflicts if another plugin bundles a different XaGUI version.
+
+If your server provides XaGUI as a separate plugin, use `compileOnly` and declare that dependency in your plugin metadata. Do not both shade XaGUI and depend on the standalone plugin.
+
+Projects using XaGUI's Paper adapter can also add `implementation 'eu.xap3y:xagui-paper:1.6.1'`. Keep both artifacts on the same version. Core works without it and falls back to Bukkit text APIs.
+
+Next: [initialize the library and create a menu](/Intro/start).

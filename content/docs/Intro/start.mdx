@@ -1,76 +1,67 @@
 ---
 title: Quick start
-Description: Get started with the Azure SDK for Java
+description: Create and open your first XaGUI 1.6.1 menu.
 ---
 
-### 1. Create an instance of the XaGUI library in onEnable() method of your plugin
+## 1. Initialize XaGUI once
 
-<details>
-<summary>Java code</summary>
+Store the instance on your plugin so every menu can use it.
 
-    ```java
+```java
+public final class MyPlugin extends JavaPlugin {
+    private XaGui xaGui;
+
     @Override
     public void onEnable() {
-        XaGui xaGui = new XaGui(this);
-    }
-    ```
-
-</details>
-
-<details>
-    <summary>Kotlin code</summary>
-
-    ```kotlin
-    override fun onEnable() {
-        val xaGui = XaGui(this)
-    }
-    ```
-</details>
-
-### 2. Creating a single page GUI with 6 rows
-
-<details>
-    <summary>Java code</summary>
-
-    ```java
-    GuiMenu gui = xaGui.createMenu("&7GUI TITLE", 6);
-
-    gui.fillBorder();
-
-    gui.addCloseButton();
-
-    gui.setOnOpen((event) -> {
-        event.getPlayer().sendMessage("You opened the GUI!");
-    });
-
-    gui.open(player);
-    ```
-
-</details>
-
-<details>
-    <summary>Kotlin code</summary>
-
-    ```kotlin
-    val gui = xaGui.createMenu("&7GUI TITLE", 6)
-    gui.fillBorder()
-
-    gui.addCloseButton();
-
-    gui.setOnOpen {
-        it.player.sendMessage("Gui opened")
+        xaGui = new XaGui(this);
     }
 
-    gui.open(player)
+    @Override
+    public void onDisable() {
+        if (xaGui != null) xaGui.closeAll();
+    }
 
-    ```
+    public XaGui getXaGui() {
+        return xaGui;
+    }
+}
+```
 
-</details>
+Constructing `XaGui` registers its inventory listener. Do this once, not every time a player opens a GUI.
 
-#### This is the result:
-<img src={"https://xap3y.eu/static/first.png"} />
+## 2. Create a menu
 
-<br/>
-For bigger example, you can visit [this project](https://github.com/xap3y/ConnectFour/)
+Rows are Minecraft inventory rows, so a 3-row menu has 27 slots (`0` through `26`).
 
-Rest of the documentation will be in Java, hope that you can convert it to Kotlin easily.
+```java
+public void openShop(Player player) {
+    GuiMenu menu = plugin.getXaGui().createMenu("&8Starter shop", 3);
+
+    menu.fillBorder();
+    menu.addCloseButton();
+
+    GuiButton diamond = new GuiButton(Material.DIAMOND)
+            .setName("&bFree diamond")
+            .setLore("&7Click to receive one")
+            .withListener(event -> {
+                Player clicker = event.getPlayer();
+                clicker.getInventory().addItem(new ItemStack(Material.DIAMOND));
+                clicker.sendMessage("You received a diamond.");
+            });
+
+    menu.setSlot(13, diamond);
+    menu.open(player);
+}
+```
+
+`GuiButton` listeners receive a `GuiClickEvent`. Useful methods include `getPlayer()`, `getClick()`, `getSlot()`, `getClickedButton()`, and `updateClickedButton()`.
+
+## Important rules
+
+- Menu row counts should normally be between 1 and 6.
+- Slot indexes start at `0`; the last slot is `menu.getSize() - 1`.
+- Slots are locked by default. Only call `unlockButton(...)` when players should move that item.
+- `setSlot(...)` replaces both item and behavior. `updateSlot(...)` changes the item while retaining the button listener.
+- `open(player)` opens page index `0`.
+
+Next, learn [buttons and click handling](/XaGui/actions) or build the [complete single-page example](/examples/example).

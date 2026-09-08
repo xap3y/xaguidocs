@@ -1,52 +1,42 @@
 ---
 title: Maven
-description: Maven
+description: Add XaGUI 1.6.1 to a Maven plugin project.
 ---
-
-## Maven installation
-
-<a href={"https://central.sonatype.com/artifact/eu.xap3y/xagui"}>
-    <img alt="Maven Central Version" src="https://img.shields.io/maven-central/v/eu.xap3y/xagui" />
-</a>
-
-
-### Add the dependency
 
 ```xml
 <dependency>
     <groupId>eu.xap3y</groupId>
     <artifactId>xagui</artifactId>
-    <version>1.3.2</version>
+    <version>1.6.1</version>
 </dependency>
 ```
 
-### Shading
-
-Replace `your.plugin.utils` with your package name
+XaGUI is a library, so it normally needs to be included in your plugin JAR:
 
 ```xml
-<plugins>
-    <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.6.0</version>
-        <configuration>
-            <relocations>
-                <relocation>
-                    <pattern>eu.xap3y.xagui</pattern>
-                    <!-- Replace your.plugin.utils with your real package -->
-                    <shadedPattern>your.plugin.utils</shadedPattern>
-                </relocation>
-            </relocations>
-        </configuration>
-        <executions>
-            <execution>
-                <phase>package</phase>
-                <goals>
-                    <goal>shade</goal>
-                </goals>
-            </execution>
-        </executions>
-    </plugin>
-</plugins>
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-shade-plugin</artifactId>
+    <version>3.6.0</version>
+    <executions>
+        <execution>
+            <phase>package</phase>
+            <goals><goal>shade</goal></goals>
+        </execution>
+    </executions>
+    <configuration>
+        <relocations>
+            <relocation>
+                <pattern>eu.xap3y.xagui</pattern>
+                <shadedPattern>com.example.myplugin.libs.xagui</shadedPattern>
+            </relocation>
+        </relocations>
+    </configuration>
+</plugin>
 ```
+
+Replace `com.example.myplugin` with your package. If XaGUI is a separate server plugin, use `provided` scope and declare it in your plugin metadata instead of shading it.
+
+For Paper-adapter features, also add `eu.xap3y:xagui-paper:1.6.1`. Keep both artifacts on version 1.6.1.
+
+Next: [initialize the library and create a menu](/Intro/start).

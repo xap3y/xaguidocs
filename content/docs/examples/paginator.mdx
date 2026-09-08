@@ -1,40 +1,33 @@
 ---
-title: Paginator
-description: Automatic paginator
+title: Custom paginator
+description: Customize automatic previous and next page controls.
 ---
 
-To use a paginator for your GUI, you need to call `.addPaginator()` method on your `GuiMenu` object. \
-This will add a paginator to your GUI that will allow you to switch between pages. \
-\
-By default, it uses `Material.ARROW` for previous and next buttons. \
-You can also specify your own items for previous and next buttons using `.setPreviousPageButton()` and `.setNextPageButton()` on `GuiMenu` object methods. \
-\
-Or specify pagination items for every gui using `XaGui#setPreviousPageButton()` and `XaGui#setNextPageButton()` methods which both accept `ItemStack` as a parameter.
-\
-To add sound when switching pages, you can use `.setPageSwitchSound()` method on `GuiMenu` object. \
-
-
-## Example
-
 ```java
-GuiInterface gui = getGui();
+GuiMenu menu = xaGui.createMenu("&8Pages", 3, 3);
 
-gui.fillBorder(); // Optional
+menu.addPaginator();
+menu.setPreviousPageButton(new GuiButton(Material.ARROW)
+        .setName("&ePrevious")
+        .setLore("&7Go back one page")
+        .getItem());
+menu.setNextPageButton(new GuiButton(Material.ARROW)
+        .setName("&eNext")
+        .setLore("&7Go forward one page")
+        .getItem());
 
-gui.setNextPageButton(new ItemStack(Material.BLAZE_ROD));
+menu.setPageSwitchSound(Sound.ITEM_BOOK_PAGE_TURN);
+menu.fillBorder();
+menu.addCloseButtonAllPages();
 
-gui.setPageSwitchSound(Sound.ITEM_BOOK_PAGE_TURN);
+menu.setSlot(0, 13, Material.DIAMOND);
+menu.setSlot(1, 13, Material.EMERALD);
+menu.setSlot(2, 13, Material.GOLD_INGOT);
 
-gui.setSlot(0, 4, Material.DIAMOND); // 1th page 4th slot
-gui.setSlot(1, 4, Material.EMERALD); // 2th page 4th slot
-gui.setSlot(2, 4, Material.GOLD_INGOT); // 3th page 4th slot
+menu.setOnPageSwitch(data -> data.getPlayer().sendMessage(
+        "Now viewing page " + (data.getTargetPage() + 1)));
 
-gui.setSlot(2, 13, testItem); // 3th page 13th slot
-
-gui.setSlot(3, 4, Material.IRON_INGOT); // 4th page 4th slot
-gui.setSlot(4, 4, Material.COAL); // 5th page 4th slot
-
-gui.addPaginator(); // Adding the paginator
-
-gui.addCloseButtonAllPages(); // Optional
+menu.open(player);
 ```
+
+Use `XaGui.setPreviousPageButton(...)` and `setNextPageButton(...)` during startup to change defaults for every menu.

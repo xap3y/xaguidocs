@@ -1,0 +1,66 @@
+---
+title: Reusable VirtualMenu
+description: Build contextual menus with the pattern used in production plugins.
+---
+
+`VirtualMenu<T>` is useful when a menu needs context such as a player, database object, filter string, or domain record. Override `build(T context)`, fill the inherited menu, and return it.
+
+```java
+import eu.xap3y.xagui.VirtualMenu;
+import eu.xap3y.xagui.XaGui;
+import eu.xap3y.xagui.interfaces.GuiMenuInterface;
+import eu.xap3y.xagui.models.GuiButton;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+
+public final class PlayerProfileMenu extends VirtualMenu<Player> {
+    public PlayerProfileMenu(XaGui xaGui) {
+        super("&8Player profile", 3, xaGui);
+    }
+
+    @Override
+    public @NotNull GuiMenuInterface build(@NotNull Player context) {
+        GuiMenuInterface menu = getGui();
+
+        // Clear dynamic content if this instance may be rebuilt.
+        menu.clearAllSlots();
+        menu.fillBorder();
+        menu.addCloseButton();
+
+        menu.setSlot(13, new GuiButton(Material.PLAYER_HEAD)
+                .setName("&e" + context.getName())
+                .setLore("&7Health: &f" + context.getHealth()));
+
+        return menu;
+    }
+}
+```
+
+Build and open in one call:
+
+```java
+PlayerProfileMenu profiles = new PlayerProfileMenu(xaGui);
+profiles.open(player, player);
+```
+
+You may also call `profiles.build(player).open(player)`. Do not call `open(player)` on `VirtualMenu` when contextual rebuilding is required; that overload opens the already-built backing menu.
+
+## Registry for named menus
+
+`GuiRegistry<K>` maps your own key type—often an enum—to virtual menus.
+
+```java
+enum MenuId { PROFILE }
+
+GuiRegistry<MenuId> registry = new GuiRegistry<>();
+registry.register(MenuId.PROFILE, new PlayerProfileMenu(xaGui), Player.class);
+
+registry.invoke(MenuId.PROFILE, viewer, profilePlayer, Player.class);
+```
+
+The context class passed to `register`, `get`, and `invoke` must match. For context-free menu keys, `invoke(key, player)` looks up a menu registered with `Void.class` and builds it with `null`; if your `build` contract is non-null, prefer a simple marker type or open the virtual menu directly.
+
+## Rebuild safety
+
+A `VirtualMenu` owns one backing `GuiMenuInterface`. If the same instance is rebuilt, clear or overwrite old dynamic slots first. For truly player-specific menus opened concurrently, create a new `VirtualMenu` instance per opening so one player's build cannot overwrite another's state.

@@ -1,79 +1,41 @@
 ---
-title: Multi Page GUI
-description: Creation of multi page GUI
+title: Data-driven paginated menu
+description: Calculate pages and distribute entries across them.
 ---
 
+This pattern is adapted from a working plugin using XaGUI 1.6.1. A six-row bordered menu has 28 convenient content slots.
 
-### Creating a multi-page GUI with 6 rows and 2 pages
 ```java
-public class ExamplePages {
+public GuiMenuInterface buildCatalog(List<Material> entries) {
+    int[] contentSlots = {
+        10, 11, 12, 13, 14, 15, 16,
+        19, 20, 21, 22, 23, 24, 25,
+        28, 29, 30, 31, 32, 33, 34,
+        37, 38, 39, 40, 41, 42, 43
+    };
 
-    public static GuiMenu createGui() {
+    int pages = Math.max(1,
+            (int) Math.ceil(entries.size() / (double) contentSlots.length));
 
-        // We will create gui with 2 pages, all pages will have same amount of rows
-        GuiMenu gui = Seasons.xagui.createMenu("&bExample", 3, 2);
+    GuiMenu menu = xaGui.createMenu("&8Material catalog", 6, pages);
+    menu.fillBorder();
+    menu.addCloseButtonAllPages();
+    menu.addPaginator();
+    menu.setPageSwitchSound(Sound.ITEM_BOOK_PAGE_TURN);
 
-        // This will fill border for all pages by default
-        gui.fillBorder();
-        // But you can also fill border for specific page, but you need to add second parameter which is ItemStack
-        //gui.fillBorder(1, new ItemStack(Material.GRAY_STAINED_GLASS_PANE));
+    for (int index = 0; index < entries.size(); index++) {
+        int page = index / contentSlots.length;
+        int slot = contentSlots[index % contentSlots.length];
+        Material material = entries.get(index);
 
-        // We can add close buttons to all pages
-        gui.addCloseButtonAllPages();
-
-        // Now we can set paper in slot 4 of first page
-        gui.setSlot(0, 4, new GuiButton(Material.PAPER).setName("&b&lPage: 1"));
-
-        // Now we can set oak sign in slot 4 of second page
-        gui.setSlot(1, 4, new GuiButton(Material.OAK_SIGN).setName("&6&lPage: 2"));
-
-        // Setting the next and previous page buttons
-        gui.setSlot(0, 26, new GuiButton(Material.ARROW).setName("&fNext page").withListener((event) -> {
-            try {
-                gui.switchPage(gui.getCurrentPageIndex()+1, (Player) event.getWhoClicked());
-            } catch (PageOutOfBoundException e) {
-                throw new RuntimeException(e);
-            }
-        }));
-
-        gui.setSlot(1, 18, new GuiButton(Material.ARROW).setName("&fPrevious page").withListener((event) -> {
-            try {
-                gui.switchPage(gui.getCurrentPageIndex()-1, (Player) event.getWhoClicked());
-            } catch (PageOutOfBoundException e) {
-                throw new RuntimeException(e);
-            }
-        }));
-
-        // Now we will set some items on the first page
-        gui.setSlot(0, 10, Material.DIAMOND_SWORD);
-        gui.setSlot(0, 11, Material.DIAMOND_PICKAXE);
-        gui.setSlot(0, 12, Material.DIAMOND_AXE);
-        gui.setSlot(0, 13, Material.DIAMOND_SHOVEL);
-
-        // And some items on the second page
-        gui.setSlot(1, 10, Material.DIAMOND_HELMET);
-        gui.setSlot(1, 11, Material.DIAMOND_CHESTPLATE);
-        gui.setSlot(1, 12, Material.DIAMOND_LEGGINGS);
-        gui.setSlot(1, 13, Material.DIAMOND_BOOTS);
-
-        // We can also set a listener for page switch
-        gui.setOnPageSwitch((event) -> {
-            event.getPlayer().sendMessage("Switched page: " + (event.getOldPage()) + " -> " + event.getPage());
-        });
-
-        return gui;
+        menu.setSlot(page, slot, new GuiButton(material)
+                .setName("&e" + material.name())
+                .withListener(event ->
+                        event.getPlayer().sendMessage("Selected " + material.name())));
     }
+
+    return menu;
 }
 ```
 
-### Opening a single page GUI
-```java
-ExamplePages.createGui().open(player);
-```
-
-## This is the result afterwards:
-
-<video width="1000" height="240" controls preload="none">
-    <source src="https://static.xap3y.eu/xagui/showcaseXaGUI3-2024-08-10_14.27.20.mp4" type="video/mp4" />
-    Your browser does not support the video tag.
-</video>
+Open it with `buildCatalog(materials).open(player)`. Build content before opening because `open(player)` starts at page index `0`.

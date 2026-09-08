@@ -1,40 +1,75 @@
 ---
-title: Actions
-description: Actions in XaGUI
+title: Buttons and events
+description: Handle button clicks and menu lifecycle events in XaGUI 1.6.1.
 ---
 
-```java
-void setOnOpen(Consumer<InventoryOpenEvent> openAction)
-void setOnOpen(GuiOpenInterface openAction)
-
-void setOnClose(Consumer<InventoryCloseEvent> closeAction)
-void setOnClose(GuiCloseInterface closeAction)
-
-void setOnClick(Consumer<InventoryClickEvent> onClick)
-void setOnClick(GuiClickInterface onClick)
-
-void setOnPageSwitch(Consumer<GuiPageSwitchModel> onPageSwitch)
-void setOnPageSwitch(GuiPageSwitchInterface onPageSwitch)
-```
-
-### Example of usage
+## Button clicks
 
 ```java
-GuiMenu gui = xaGui.createMenu("Example GUI", 3);
+GuiButton toggle = new GuiButton(Material.LEVER)
+        .setName("&eToggle setting")
+        .withClickSound(Sound.UI_BUTTON_CLICK, 0.8f)
+        .withListener(event -> {
+            Player player = event.getPlayer();
+            player.sendMessage("Click type: " + event.getClick());
+        });
 
-gui.setOnPageSwitch((data) -> {
-    data.getPlayer().sendMessage("You switched to page " + data.getPage() + " from page " + data.getOldPage());
-});
-
-gui.setOnOpen((event) -> {
-    event.getPlayer().sendMessage("You opened the GUI!");
-});
-
-gui.setOnClose((event) -> {
-    event.getPlayer().sendMessage("You closed the GUI!");
-});
-
-gui.setOnClick((event) -> {
-    event.getWhoClicked().sendMessage("You clicked on slot " + event.getSlot());
-});
+menu.setSlot(13, toggle);
 ```
+
+The callback receives `GuiClickEvent`, an `InventoryClickEvent` subclass. A clicked button's listener runs after the menu-level top-inventory listener.
+
+## Change the clicked button
+
+```java
+GuiButton button = new GuiButton(Material.RED_DYE)
+        .setName("&cDisabled")
+        .withListener(event -> {
+            GuiButtonInterface clicked = event.getClickedButton();
+            if (clicked == null) return;
+
+            clicked.setItem(new GuiButton(Material.LIME_DYE)
+                    .setName("&aEnabled")
+                    .getItem());
+            event.updateClickedButton(clicked);
+        });
+```
+
+`updateSlot(slot, item)` is simpler when only the item should change and the existing listener should remain.
+
+## Menu callbacks
+
+```java
+menu.setOnOpen(event ->
+        event.getPlayer().sendMessage("Opened the menu"));
+menu.setOnClose(event ->
+        event.getPlayer().sendMessage("Closed the menu"));
+menu.setOnClick(event ->
+        event.getPlayer().sendMessage("Clicked GUI slot " + event.getSlot()));
+menu.setOnClickOwn(event ->
+        event.getPlayer().sendMessage("Clicked their own inventory"));
+menu.setOnPageSwitch(data ->
+        data.getPlayer().sendMessage(
+                "Page index " + data.getOldPage() + " -> " + data.getTargetPage()));
+```
+
+The 1.6.1 page-switch model exposes `getTargetPage()` and `getOldPage()`. Both are zero-based.
+
+## Click policies
+
+GUI slots are cancelled unless unlocked. You can filter click types:
+
+```java
+menu.allowClickTypes(ClickType.LEFT, ClickType.RIGHT);
+// Or, when no allow-list is set:
+menu.blacklistClickTypes(ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT);
+```
+
+An allow-list takes priority over the blacklist. To permit clicks in the player's lower inventory:
+
+```java
+menu.setSelfInventoryAccess(true);
+menu.allowSelfInventoryClickTypes(ClickType.LEFT, ClickType.RIGHT);
+```
+
+Be careful with shift-click and number-key actions: allowing lower-inventory access can let items move into the GUI.

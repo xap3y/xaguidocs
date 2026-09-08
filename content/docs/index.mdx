@@ -1,21 +1,29 @@
 ---
-title: XaGUI Docs
-description: Lightweight and easy to use Minecraft menu library by XAP3Y.
+title: XaGUI 1.6.1
+description: Build inventory GUIs for Bukkit, Spigot, Paper, and Folia plugins.
 ---
 
-Lightweight and easy to use Minecraft menu library.
+XaGUI is a Java library for building chest-style Minecraft inventory menus. It handles inventory creation, locked slots, button callbacks, multiple pages, navigation, and menu lifecycle events.
 
-## Features
+These docs target **XaGUI 1.6.1**. The examples use Java and Bukkit/Paper types, but the core artifact remains Java 8 compatible.
 
-- Easy to use
-- Page system
-- Customizable
-- Lightweight
-- ItemBuilder
-
-## Installation
+## Start here
 
 <Cards>
-  <Card target="_self" title="Maven" href="/Installation/maven" />
-  <Card target="_self" title="Gradle" href="/Installation/gradle" />
+  <Card target="_self" title="Install XaGUI" href="/Installation/gradle" description="Add version 1.6.1 and package it with your plugin." />
+  <Card target="_self" title="Your first GUI" href="/Intro/start" description="Initialize XaGUI, create a menu, add a button, and open it." />
+  <Card target="_self" title="Real-world menu pattern" href="/examples/virtual-menu" description="Build reusable, data-driven menus with VirtualMenu." />
 </Cards>
+
+## The four main types
+
+| Type | Purpose |
+| --- | --- |
+| `XaGui` | Library entry point. Create one instance when your plugin enables. |
+| `GuiMenuInterface` / `GuiMenu` | A menu: title, rows, pages, slots, and lifecycle handlers. |
+| `GuiButton` | An item plus optional name, lore, sound, click callback, or redirect. |
+| `VirtualMenu<T>` | A reusable menu class whose `build(T context)` method fills the GUI from data. |
+
+Menu slots are locked by default, `&` color codes work in titles and item text, and pages and slots use **zero-based indexes** in method calls.
+
+Continue with [Quick start](/Intro/start).

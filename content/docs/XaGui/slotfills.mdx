@@ -1,35 +1,54 @@
 ---
-title: Slot filling
-description: Slot filling is just easy way to set multiple slots at once
+title: Slots, borders, and locking
+description: Place, update, fill, clear, and unlock GUI slots.
 ---
 
-Slot filling is just easy way to set multiple slots at once
-
-## List of methods:
+## Set, update, and clear
 
 ```java
-void fillSlots(HashSet<Integer> slots)
-void fillSlots(int page, HashSet<Integer> slots)
-void fillSlots(HashSet<Integer> slots, ItemStack item)
-void fillSlots(int page, HashSet<Integer> slots, ItemStack item)
-void fillSlots(int page, HashSet<Integer> slots, GuiButtonInterface button)
+menu.setSlot(10, Material.DIAMOND);
+menu.setSlot(11, new ItemStack(Material.EMERALD, 16));
+menu.setSlot(12, new GuiButton(Material.GOLD_INGOT).setName("&6Gold"));
+menu.setSlot(1, 10, Material.NETHERITE_INGOT); // page, slot, value
+
+menu.updateSlot(12, Material.IRON_INGOT); // retains the button callback
+menu.clearSlot(12);
+menu.clearSlot(1, 10);
+menu.clearAllSlots(1);
 ```
 
-## Example:
+Overloads without a page use the current page. Prefer explicit pages when constructing multi-page menus. `updateSlot` does nothing if no button exists; `setSlot` creates or replaces one.
+
+## Fill several slots
+
+In 1.6.1 the item comes before the slots:
 
 ```java
-GuiMenu gui = xaGui.createMenu("&a&lExample GUI", 3);
+ItemStack filler = new GuiButton(Material.GRAY_STAINED_GLASS_PANE)
+        .setName(" ").getItem();
 
-gui.fillSlots(new HashSet<>(Arrays.asList(0, 1, 2, 3, 4)));
-
-gui.fillSlots(new HashSet<>(Arrays.asList(12, 13, 14)), new ItemStack(Material.DIRT, 64));
-
-GuiButtonInterface closeButton = new GuiButton(new ItemStack(Material.BARRIER, 1)).setName("&cClose").withListener((event) -> {
-    player.closeInventory();
-}).setLore(Arrays.asList(" ", "&aClick to close Inventory"));
-
-gui.fillSlots(gui.getCurrentPageIndex(), new HashSet<>(Arrays.asList(21, 22, 23)), closeButton);
+menu.fillSlots(filler, 0, 1, 2, 3, 4);
+menu.fillSlots(1, filler, 9, 17, 18, 26); // page, item, slots
 ```
 
-### Result:
-<img src={"https://xap3y.eu/static/filler.png"} />
+Current-page overloads also accept `Integer[]`, `Set<Integer>`, or `List<Integer>`. A `GuiButtonInterface` can be used with vararg slots.
+
+## Borders
+
+```java
+menu.fillBorder(); // global filler on every page
+menu.fillBorder(Material.BLUE_STAINED_GLASS_PANE); // current page
+menu.fillBorder(1, filler); // explicit page
+```
+
+## Locked slots
+
+All GUI slots are locked by default. Unlock only items intended to move:
+
+```java
+menu.setSlot(13, Material.DIAMOND);
+menu.unlockButton(13);
+menu.lockButton(13); // lock it again
+```
+
+Note: in 1.6.1, `isButtonLocked(slot)` returns `true` when the current-page slot is in the internal **unlocked** set. Use `unlockButton` and `lockButton` for clear intent.
